@@ -9,7 +9,7 @@ import { db, generationsTable, usersTable } from "@workspace/db";
 import { eq, sql, createHash } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { createHash as nodeHash } from "crypto";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const router = Router();
 
