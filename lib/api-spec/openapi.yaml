@@ -1,0 +1,576 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: ArabVoice AI API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: tts
+    description: Text-to-speech generation
+  - name: voices
+    description: Voice management
+  - name: history
+    description: Generation history
+  - name: user
+    description: User profile and credits
+  - name: admin
+    description: Admin operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /voices:
+    get:
+      operationId: listVoices
+      tags: [voices]
+      summary: List available Edge-TTS Arabic voices
+      responses:
+        "200":
+          description: List of voices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Voice"
+
+  /tts/edge:
+    post:
+      operationId: generateEdgeTts
+      tags: [tts]
+      summary: Generate speech with Edge-TTS (free)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EdgeTtsInput"
+      responses:
+        "200":
+          description: Audio generation job created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerationResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /tts/xtts:
+    post:
+      operationId: generateXtts
+      tags: [tts]
+      summary: Generate speech with XTTS premium (voice cloning)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/XttsInput"
+      responses:
+        "200":
+          description: Audio generation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerationResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Premium required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /history:
+    get:
+      operationId: listHistory
+      tags: [history]
+      summary: Get current user generation history
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Generation history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryPage"
+    post:
+      operationId: saveHistory
+      tags: [history]
+      summary: Save a generation to history
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HistoryInput"
+      responses:
+        "201":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryItem"
+
+  /history/{id}:
+    delete:
+      operationId: deleteHistory
+      tags: [history]
+      summary: Delete a history item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /user/profile:
+    get:
+      operationId: getUserProfile
+      tags: [user]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    patch:
+      operationId: updateUserProfile
+      tags: [user]
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /user/credits:
+    get:
+      operationId: getUserCredits
+      tags: [user]
+      summary: Get user credit balance and usage stats
+      responses:
+        "200":
+          description: Credit info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditInfo"
+
+  /user/stats:
+    get:
+      operationId: getUserStats
+      tags: [user]
+      summary: Get user dashboard stats (totals, recent activity)
+      responses:
+        "200":
+          description: User stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      summary: Admin - list all users
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUsersPage"
+
+  /admin/users/{id}/subscription:
+    patch:
+      operationId: updateUserSubscription
+      tags: [admin]
+      summary: Admin - activate or change user subscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Admin - platform-wide statistics
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/generations:
+    get:
+      operationId: listAdminGenerations
+      tags: [admin]
+      summary: Admin - all recent generations
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Generations list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminGenerationsPage"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Voice:
+      type: object
+      required: [id, name, language, gender, locale]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        language:
+          type: string
+        gender:
+          type: string
+        locale:
+          type: string
+        preview:
+          type: ["string", "null"]
+
+    EdgeTtsInput:
+      type: object
+      required: [text, voiceId]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        voiceId:
+          type: string
+        speed:
+          type: number
+          default: 1.0
+        pitch:
+          type: number
+          default: 0
+        userId:
+          type: ["string", "null"]
+
+    XttsInput:
+      type: object
+      required: [text, speakerAudioUrl]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        speakerAudioUrl:
+          type: string
+        language:
+          type: string
+          default: ar
+        userId:
+          type: ["string", "null"]
+
+    GenerationResult:
+      type: object
+      required: [audioUrl, engine, duration, text]
+      properties:
+        audioUrl:
+          type: string
+        engine:
+          type: string
+        engineUsed:
+          type: string
+          description: "Which engine actually produced the audio: railway, hf-fallback, or cached"
+        fromCache:
+          type: boolean
+          description: Whether this result was served from cache (no credits charged)
+        duration:
+          type: ["number", "null"]
+        text:
+          type: string
+        historyId:
+          type: ["string", "null"]
+
+    HistoryItem:
+      type: object
+      required: [id, text, audioUrl, engine, createdAt]
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        audioUrl:
+          type: string
+        engine:
+          type: string
+        duration:
+          type: ["number", "null"]
+        voiceId:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    HistoryPage:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryItem"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    HistoryInput:
+      type: object
+      required: [text, audioUrl, engine]
+      properties:
+        text:
+          type: string
+        audioUrl:
+          type: string
+        engine:
+          type: string
+        duration:
+          type: ["number", "null"]
+        voiceId:
+          type: ["string", "null"]
+        userId:
+          type: ["string", "null"]
+
+    UserProfile:
+      type: object
+      required: [id, email, plan, createdAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: ["string", "null"]
+        plan:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        avatarUrl:
+          type: string
+
+    CreditInfo:
+      type: object
+      required: [plan, creditsUsed, creditsLimit, resetsAt]
+      properties:
+        plan:
+          type: string
+        creditsUsed:
+          type: integer
+        creditsLimit:
+          type: integer
+        resetsAt:
+          type: ["string", "null"]
+        canUseXtts:
+          type: boolean
+        canDownloadWav:
+          type: boolean
+
+    UserStats:
+      type: object
+      required: [totalGenerations, todayGenerations, totalDuration, favoriteVoice]
+      properties:
+        totalGenerations:
+          type: integer
+        todayGenerations:
+          type: integer
+        totalDuration:
+          type: number
+        favoriteVoice:
+          type: ["string", "null"]
+        lastGeneratedAt:
+          type: ["string", "null"]
+
+    AdminUser:
+      type: object
+      required: [id, email, plan, totalGenerations, createdAt]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: ["string", "null"]
+        plan:
+          type: string
+        totalGenerations:
+          type: integer
+        creditsUsed:
+          type: integer
+        createdAt:
+          type: string
+
+    AdminUsersPage:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminUser"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    SubscriptionUpdate:
+      type: object
+      required: [plan]
+      properties:
+        plan:
+          type: string
+        creditsLimit:
+          type: ["integer", "null"]
+
+    AdminStats:
+      type: object
+      required: [totalUsers, totalGenerations, todayGenerations, activeSubscriptions]
+      properties:
+        totalUsers:
+          type: integer
+        totalGenerations:
+          type: integer
+        todayGenerations:
+          type: integer
+        activeSubscriptions:
+          type: integer
+        freeUsers:
+          type: integer
+        revenueThisMonth:
+          type: number
+
+    AdminGenerationsPage:
+      type: object
+      required: [items, total, page]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryItem"
+        total:
+          type: integer
+        page:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

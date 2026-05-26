@@ -1,0 +1,274 @@
+Build a production-ready Arabic AI Voice SaaS platform similar to ElevenLabs, optimized for Egyptian and Arabic users.
+
+Tech Stack:
+- Next.js 15
+- JavaScript only (NO TypeScript)
+- Tailwind CSS
+- Supabase (Auth + Database + Storage)
+- Railway deployment compatible
+- Edge-TTS as default free voice engine
+- Hugging Face XTTS-v2 API for premium AI voice cloning
+- Responsive modern UI
+- Dark mode support
+
+Project Name:
+ArabVoice AI
+
+Main Goal:
+Users can generate Arabic AI voices, clone voices, create TikTok voiceovers, and download audio files.
+
+========================================
+CORE FEATURES
+========================================
+
+1. AUTHENTICATION
+- Supabase email/password auth
+- Login page
+- Signup page
+- Forgot password
+- Session persistence
+- User dashboard
+
+2. LANDING PAGE
+Modern SaaS landing page including:
+- Hero section
+- Arabic AI voice demo
+- Pricing section
+- Features section
+- FAQ
+- CTA buttons
+- Testimonials
+- Mobile responsive
+
+Style inspiration:
+- ElevenLabs
+- HeyGen
+- Minimal modern SaaS
+
+3. DASHBOARD
+User dashboard with:
+- Sidebar navigation
+- Voice generation page
+- Voice cloning page
+- History page
+- Subscription page
+- Profile settings
+
+4. EDGE-TTS FREE ENGINE
+Implement Edge-TTS for standard voice generation.
+
+Features:
+- Arabic voices
+- Egyptian Arabic support
+- Fast generation
+- Generate MP3/WAV
+- Text input
+- Voice selector
+- Speed control
+- Pitch control
+
+Use Edge-TTS as FREE plan engine.
+
+5. XTTS PREMIUM ENGINE
+Integrate Hugging Face XTTS-v2 API.
+
+Endpoint:
+https://api-inference.huggingface.co/models/coqui/XTTS-v2
+
+Requirements:
+- API route: /api/xtts
+- Use process.env.HF_TOKEN
+- Accept:
+  - text
+  - language
+  - speaker audio upload
+- Return WAV audio
+- Loading states
+- Error handling
+
+IMPORTANT:
+DO NOT run XTTS locally.
+Use Hugging Face inference API only.
+
+6. VOICE CLONING PAGE
+Premium feature.
+
+Allow users to:
+- Upload sample voice
+- Enter Arabic text
+- Generate cloned voice
+- Preview audio
+- Download audio
+
+7. GENERATION HISTORY
+Save:
+- text
+- audio URL
+- generation date
+- engine used
+- duration
+
+Use Supabase database.
+
+8. STORAGE
+Use Supabase Storage for:
+- uploaded voice samples
+- generated audio files
+
+9. CREDIT SYSTEM
+Implement credit-based usage.
+
+FREE PLAN:
+- 10 generations/day
+- Edge-TTS only
+- max 30 seconds
+
+STARTER PLAN:
+- 200 generations
+- HD audio
+- No watermark
+
+CREATOR PLAN:
+- 1000 generations
+- Faster queue
+- WAV export
+
+PRO CLONE PLAN:
+- XTTS cloning
+- custom voices
+- unlimited history
+
+10. PAYMENT SYSTEM
+Egyptian market focused.
+
+NO Stripe initially.
+
+Implement:
+- WhatsApp payment request system
+- Vodafone Cash
+- Orange Cash
+- Etisalat Cash
+- InstaPay
+
+Workflow:
+- User clicks subscribe
+- Opens WhatsApp with prefilled message
+- Admin manually activates subscription
+
+Use WhatsApp deep links.
+
+11. AUDIO PLAYER
+Custom modern audio player:
+- Play/Pause
+- Download
+- waveform style UI
+- duration display
+
+12. API SECURITY
+IMPORTANT:
+- Never expose HF_TOKEN in frontend
+- Use backend API routes only
+- Protect premium endpoints
+- Add rate limiting
+
+13. DATABASE SCHEMA
+Create tables:
+- users
+- generations
+- subscriptions
+- payments
+- voice_uploads
+
+14. ADMIN PANEL
+Simple admin dashboard:
+- View users
+- Activate subscriptions
+- View generations
+- Manage plans
+- Payment verification
+
+15. UI/UX
+Requirements:
+- Premium SaaS feel
+- Arabic RTL support
+- English support
+- Smooth animations
+- Glassmorphism cards
+- Gradient buttons
+- Clean typography
+
+16. DEPLOYMENT
+Optimize for Railway deployment.
+
+Requirements:
+- lightweight server
+- no local GPU
+- production environment variables
+- deploy-ready
+
+17. ENVIRONMENT VARIABLES
+Create .env.example including:
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+- SUPABASE_SERVICE_ROLE_KEY
+- HF_TOKEN
+
+18. FILE STRUCTURE
+Generate clean scalable structure:
+- app/
+- components/
+- lib/
+- api/
+- utils/
+- hooks/
+
+19. ADDITIONAL FEATURES
+Include:
+- Copy text button
+- Character counter
+- Arabic sample templates
+- TikTok/Reels optimized mode
+- Loading skeletons
+- Toast notifications
+
+20. PERFORMANCE
+Optimize:
+- lazy loading
+- API caching
+- compressed audio
+- mobile performance
+
+========================================
+IMPORTANT RULES
+========================================
+
+- Use JavaScript only
+- Do not use TypeScript
+- Use App Router
+- Use modern React practices
+- Clean reusable components
+- Add comments in important files
+- Make everything production-ready
+- Keep code Railway compatible
+- Avoid heavy backend processing
+- Use external AI APIs only
+
+========================================
+DELIVERABLES
+========================================
+
+Provide:
+1. Full project source code
+2. Railway deployment configuration
+3. Supabase setup guide
+4. Environment setup
+5. Hugging Face integration
+6. README.md
+7. Deployment instructions
+8. Clean responsive UI
+9. Working authentication
+10. Functional AI voice generation
+
+The project should run immediately after:
+npm install
+npm run dev
